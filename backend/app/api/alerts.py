@@ -28,7 +28,11 @@ def format_alert_item(doc: dict) -> AlertItem:
         status=doc.get("status", "active"),
         created_at=created_str,
         acknowledged=bool(doc.get("acknowledged", False)),
+        source=doc.get("source", "rule"),
+        likely_root_cause=doc.get("likely_root_cause"),
+        recommended_action=doc.get("recommended_action"),
     )
+
 
 
 @router.get("", response_model=List[AlertItem])

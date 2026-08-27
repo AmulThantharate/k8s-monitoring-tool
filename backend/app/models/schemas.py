@@ -57,8 +57,9 @@ class LogEntry(BaseModel):
 # Alert Schemas
 # ==========================================
 
-AlertSeverity = Literal["warning", "critical"]
+AlertSeverity = Literal["info", "warning", "critical"]
 AlertStatus = Literal["active", "resolved"]
+AlertSource = Literal["rule", "ai"]
 
 
 class AlertItem(BaseModel):
@@ -71,6 +72,19 @@ class AlertItem(BaseModel):
     status: AlertStatus
     created_at: str  # ISO-8601 string format
     acknowledged: bool
+    source: AlertSource = "rule"
+    likely_root_cause: Optional[str] = None
+    recommended_action: Optional[str] = None
+
+
+# ==========================================
+# Config Schemas
+# ==========================================
+
+class AppConfigResponse(BaseModel):
+    ai_enabled: bool
+    ai_provider: Optional[str] = None
+    ai_model: Optional[str] = None
 
 
 # ==========================================
@@ -103,3 +117,4 @@ class RescanResponse(BaseModel):
 
 class HealthResponse(BaseModel):
     status: str = "ok"
+

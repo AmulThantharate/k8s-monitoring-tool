@@ -5,7 +5,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
-        env_file=".env",
+        env_file=(".env", "backend/.env", "../.env"),
         env_file_encoding="utf-8",
         extra="ignore",
     )
@@ -37,6 +37,32 @@ class Settings(BaseSettings):
     # Alert Rule Engine
     RULE_ENGINE_INTERVAL_MS: int = 30000
 
+    # Slack Integration Endpoints
+    SLACK_WEBHOOK_URL_ALERTS: str | None = None
+    SLACK_WEBHOOK_URL_AI_ANALYSIS: str | None = None
+
+    # AI Anomaly Detection Settings
+    AI_ENABLED: bool = True
+    AI_PROVIDER: str = "groq"  # "groq" | "openai" | "anthropic" | "azure"
+    AI_MODEL: str = "openai/gpt-oss-120b"
+    AI_ANALYSIS_INTERVAL_MS: int = 30000  # 30 seconds
+
+    # Namespace Filtering (Filter out noisy internal Kubernetes system pods)
+    EXCLUDE_SYSTEM_NAMESPACES: bool = True
+    IGNORED_NAMESPACES: List[str] = [
+        "kube-system",
+        "kube-public",
+        "kube-node-lease",
+        "monitoring",
+    ]
+
+    # AI Provider API Keys & Endpoints
+    GROQ_API_KEY: str | None = None
+    OPENAI_API_KEY: str | None = None
+    ANTHROPIC_API_KEY: str | None = None
+    AZURE_OPENAI_API_KEY: str | None = None
+    AZURE_OPENAI_ENDPOINT: str | None = None
+
     # CORS configuration
     CORS_ORIGINS: List[str] = [
         "http://localhost:3000",
@@ -59,3 +85,4 @@ class Settings(BaseSettings):
 
 
 settings = Settings()
+

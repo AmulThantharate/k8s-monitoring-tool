@@ -4,6 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.config import settings
 from app.core.database import connect_to_mongo, close_mongo_connection
 from app.services.rule_engine import start_rule_engine, stop_rule_engine
+from app.services.ai_engine import start_ai_engine, stop_ai_engine
 from app.models.schemas import HealthResponse
 
 # Routers
@@ -13,6 +14,7 @@ from app.api.nodes import router as nodes_router
 from app.api.logs import router as logs_router
 from app.api.alerts import router as alerts_router
 from app.api.clusters import router as clusters_router
+from app.api.config import router as config_router
 
 
 @asynccontextmanager
@@ -27,10 +29,14 @@ async def lifespan(app: FastAPI):
     # Start background rule evaluation loop
     start_rule_engine()
 
+    # Start background AI analysis loop if enabled
+    start_ai_engine()
+
     yield
 
     # Shutdown
     print("[Server] Shutting down FastAPI Backend...")
+    stop_ai_engine()
     stop_rule_engine()
     await close_mongo_connection()
 
@@ -65,3 +71,5 @@ app.include_router(nodes_router)
 app.include_router(logs_router)
 app.include_router(alerts_router)
 app.include_router(clusters_router)
+app.include_router(config_router)
+

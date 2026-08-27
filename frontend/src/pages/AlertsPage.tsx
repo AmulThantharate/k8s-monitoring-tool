@@ -19,8 +19,9 @@ interface GroupedAlert {
   pod: string;
   namespace: string;
   rule: string;
-  severity: 'critical' | 'warning';
+  severity: import('../types').AlertSeverity;
   message: string;
+
   status: 'active' | 'resolved';
   latestTimestamp: string;
   earliestTimestamp: string;
@@ -269,14 +270,27 @@ export const AlertsPage: React.FC<AlertsPageProps> = ({
 
                       <td className="py-3 px-3">
                         <div className="flex flex-col">
-                          <span className="font-mono text-xxs font-semibold text-text-secondary">
-                            {group.rule}
-                          </span>
+                          <div className="flex items-center space-x-1.5">
+                            <span className="font-mono text-xxs font-semibold text-text-secondary">
+                              {group.rule}
+                            </span>
+                            {group.items[0]?.source === 'ai' && (
+                              <span className="px-1.5 py-0.2 rounded text-[9px] font-mono font-medium bg-purple-500/20 text-purple-300 border border-purple-500/30">
+                                AI INSIGHT
+                              </span>
+                            )}
+                          </div>
                           <span className={clsx('text-xs', isActive ? 'text-text-primary' : 'text-text-secondary/70')}>
                             {group.message}
                           </span>
+                          {group.items[0]?.recommended_action && (
+                            <span className="text-[11px] text-accent/90 font-mono mt-1">
+                              💡 Action: {group.items[0].recommended_action}
+                            </span>
+                          )}
                         </div>
                       </td>
+
 
                       <td className="py-3 px-3">
                         {count > 1 ? (
@@ -417,14 +431,27 @@ export const AlertsPage: React.FC<AlertsPageProps> = ({
                     </td>
                     <td className="py-3 px-4">
                       <div className="flex flex-col">
-                        <span className="font-mono text-xxs font-semibold text-text-secondary">
-                          {alert.rule}
-                        </span>
+                        <div className="flex items-center space-x-1.5">
+                          <span className="font-mono text-xxs font-semibold text-text-secondary">
+                            {alert.rule}
+                          </span>
+                          {alert.source === 'ai' && (
+                            <span className="px-1.5 py-0.2 rounded text-[9px] font-mono font-medium bg-purple-500/20 text-purple-300 border border-purple-500/30">
+                              AI INSIGHT
+                            </span>
+                          )}
+                        </div>
                         <span className={clsx('text-xs', isActive ? 'text-text-primary' : 'text-text-secondary/70')}>
                           {alert.message}
                         </span>
+                        {alert.recommended_action && (
+                          <span className="text-[11px] text-accent/90 font-mono mt-1">
+                            💡 Action: {alert.recommended_action}
+                          </span>
+                        )}
                       </div>
                     </td>
+
                     <td className="py-3 px-4">
                       {isActive ? (
                         <span className="inline-flex items-center px-1.5 py-0.5 rounded text-xxs font-mono font-semibold bg-rose-500/15 text-rose-400 border border-rose-500/30 uppercase">

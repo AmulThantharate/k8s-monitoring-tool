@@ -5,6 +5,7 @@ from bson import ObjectId
 from app.config import settings
 from app.core.database import get_database
 from app.services.prometheus import fetch_pod_metrics_summary, fetch_node_metrics_summary
+from app.services.slack import send_slack_alert
 
 # In-memory tracker for pod restart counts: podKey -> last restart count
 last_restart_counts: Dict[str, int] = {}
@@ -22,7 +23,11 @@ async def run_rule_evaluation():
 
         # 1. Evaluate Pod Metrics
         for pod in pods:
+            if settings.EXCLUDE_SYSTEM_NAMESPACES and pod.namespace in settings.IGNORED_NAMESPACES:
+                continue
+
             pod_key = f"{pod.namespace}/{pod.pod}"
+
 
             # CPU Thresholds
             if pod.cpu_percent > 95:
@@ -107,10 +112,21 @@ async def run_rule_evaluation():
                         "message": cond["message"],
                         "status": "active",
                         "acknowledged": False,
+                        "source": "rule",
+                        "likely_root_cause": None,
+                        "recommended_action": None,
                         "created_at": datetime.now(timezone.utc),
                         "resolved_at": None,
                     }
                     await alerts_col.insert_one(new_alert_doc)
+                    # Trigger Slack alert
+                    await send_slack_alert(
+                        pod=cond["pod"],
+                        namespace=cond["namespace"],
+                        rule=cond["rule"],
+                        severity=cond["severity"],
+                        message=cond["message"],
+                    )
                 except Exception as err:
                     print(f"[RuleEngine] Error inserting alert {key}: {err}")
 

@@ -23,8 +23,9 @@ export interface NodeMetric {
   memory_percent: number;
 }
 
-export type AlertSeverity = 'warning' | 'critical';
+export type AlertSeverity = 'info' | 'warning' | 'critical';
 export type AlertStatus = 'active' | 'resolved';
+export type AlertSource = 'rule' | 'ai';
 
 export interface AlertItem {
   id: string;
@@ -36,7 +37,11 @@ export interface AlertItem {
   status: AlertStatus;
   created_at: string;
   acknowledged: boolean;
+  source?: AlertSource;
+  likely_root_cause?: string;
+  recommended_action?: string;
 }
+
 
 export type ClusterProvider = 'eks' | 'aks' | 'gke' | 'minikube' | 'kind' | 'k3s' | 'unknown';
 
