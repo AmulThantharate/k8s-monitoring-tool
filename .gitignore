@@ -98,3 +98,4 @@ htmlcov/
 *.mov
 1stDraft.mp4
 ai-slack-integration-prompt.md
+venv/
