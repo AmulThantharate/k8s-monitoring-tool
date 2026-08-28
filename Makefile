@@ -1,8 +1,3 @@
-# ============================================================
-#  Kubernetes Monitoring Tool — Makefile
-#  Usage: make <target>
-# ============================================================
-
 MINIKUBE_HOST_IP  := 192.168.49.1
 LOKI_PUSH_URL     := http://$(MINIKUBE_HOST_IP):3100/loki/api/v1/push
 PROMETHEUS_NS     := monitoring
