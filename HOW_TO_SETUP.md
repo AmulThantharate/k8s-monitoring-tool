@@ -73,6 +73,12 @@ helm install monitoring prometheus-community/kube-prometheus-stack \
 helm install promtail grafana/promtail \
   --namespace monitoring \
   --set "config.clients[0].url=http://192.168.49.1:3100/loki/api/v1/push"
+
+# 5. How to see pods
+kubectl get pods -n monitoring 
+
+# 6. How to check logs
+kubectl logs -f -n monitoring <pod-name>
 ```
 
 ### Step 2: Start Local Supporting Infrastructure
