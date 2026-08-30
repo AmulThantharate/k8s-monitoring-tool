@@ -11,6 +11,8 @@ A high-performance async Python/FastAPI backend for the Kubernetes Observability
 - Running infrastructure (MongoDB `:27017`, Prometheus `:9090`, Loki `:3100`)
 
 ### 2. Setup Virtual Environment & Dependencies
+
+**Linux / macOS:**
 ```bash
 cd backend
 python3 -m venv .venv
@@ -18,13 +20,25 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
+**Windows (PowerShell / Command Prompt):**
+```powershell
+cd backend
+python -m venv .venv
+.venv\Scripts\activate
+pip install -r requirements.txt
+```
+
 ### 3. Start the FastAPI Server
 ```bash
-# From backend directory:
+# From workspace root (works across Windows, macOS, Linux):
+npm run backend:dev
+
+# Or directly from the backend directory:
+# Linux/macOS:
 .venv/bin/uvicorn app.main:app --host 0.0.0.0 --port 4000 --reload
 
-# Or from workspace root:
-npm run backend:dev
+# Windows:
+.venv\Scripts\uvicorn.exe app.main:app --host 0.0.0.0 --port 4000 --reload
 ```
 - **API Base URL**: `http://localhost:4000`
 - **Interactive Swagger Docs**: `http://localhost:4000/docs`

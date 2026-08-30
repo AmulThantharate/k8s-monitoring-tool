@@ -18,6 +18,7 @@ This guide walks you through setting up and testing the **Kubernetes Monitoring 
 
 Make sure you have the following installed on your machine:
 - **Node.js** (v18+ recommended) & **npm**
+- **Python** 3.10+ & **pip**
 - **Docker** & **Docker Compose**
 - *(For K8s testing)*: **Minikube**, **kubectl**, and **Helm**
 
@@ -33,16 +34,36 @@ npm run infra:up
 ```
 *(Starts MongoDB on `:27017`, Prometheus on `:9090`, and Loki on `:3100`)*
 
-### Step 2: Start Backend Server
+### Step 2: Install Backend Dependencies (First-time setup)
+**Linux / macOS:**
+```bash
+cd backend
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+cd ..
+```
+
+**Windows (PowerShell / Command Prompt):**
+```powershell
+cd backend
+python -m venv .venv
+.venv\Scripts\activate
+pip install -r requirements.txt
+cd ..
+```
+
+### Step 3: Start Backend Server
 In your first terminal:
 ```bash
 npm run backend:dev
 ```
+- Cross-platform: Automatically detects `.venv` on Windows, Linux, and macOS.
 - Listens on `http://localhost:4000`.
 - Connects to MongoDB, Prometheus, and Loki.
 - Runs the continuous alert rule engine.
 
-### Step 3: Start Frontend UI
+### Step 4: Start Frontend UI
 In a second terminal:
 ```bash
 npm run frontend:dev

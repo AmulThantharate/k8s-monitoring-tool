@@ -151,18 +151,27 @@ SLACK_WEBHOOK_URL_AI_ANALYSIS=https://hooks.slack.com/services/YOUR/AI/WEBHOOK
 
 **Terminal 1 (Backend):**
 ```bash
-cd backend
-source venv/bin/activate
-uvicorn app.main:app --host 0.0.0.0 --port 4000 --reload
+# From workspace root (Windows / macOS / Linux):
+npm run backend:dev
+
+# Or from backend directory:
+# Linux/macOS:
+cd backend && source .venv/bin/activate && uvicorn app.main:app --host 0.0.0.0 --port 4000 --reload
+# Windows:
+cd backend && .venv\Scripts\activate && uvicorn app.main:app --host 0.0.0.0 --port 4000 --reload
 ```
 
 **Terminal 2 (Frontend):**
 ```bash
+# From workspace root:
+npm run frontend:dev
+
+# Or from frontend directory:
 cd frontend
 npm run dev
 ```
 
-Dashboard is live at **`http://localhost:5173`**!
+Dashboard is live at **`http://localhost:3000`** (or `http://localhost:5173`)!
 
 ---
 

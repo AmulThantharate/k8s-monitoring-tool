@@ -5,8 +5,8 @@
   "scripts": {
     "infra:up": "docker compose -f docker-compose.local.yml up -d",
     "infra:down": "docker compose -f docker-compose.local.yml down",
-    "backend:dev": "cd backend && .venv/bin/uvicorn app.main:app --host 0.0.0.0 --port 4000 --reload",
-    "backend:start": "cd backend && .venv/bin/uvicorn app.main:app --host 0.0.0.0 --port 4000",
+    "backend:dev": "node scripts/run-backend.js --reload",
+    "backend:start": "node scripts/run-backend.js",
     "frontend:dev": "npm --prefix frontend run dev",
     "frontend:build": "npm --prefix frontend run build"
   }
