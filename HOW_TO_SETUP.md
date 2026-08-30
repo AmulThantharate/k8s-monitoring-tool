@@ -66,7 +66,7 @@ helm repo add grafana https://grafana.github.io/helm-charts
 helm repo update
 
 # 3. Install Prometheus Operator & Kube-State-Metrics
-helm install monitoring prometheus-community/kube-protheus-stack \
+helm install monitoring prometheus-community/kube-prometheus-stack \
   --namespace monitoring --create-namespace
 
 # 4. Install Promtail to stream live pod logs to Loki
