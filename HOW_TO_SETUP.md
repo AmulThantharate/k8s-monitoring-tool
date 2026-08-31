@@ -22,6 +22,8 @@ Make sure you have the following installed on your machine:
 - **Docker** & **Docker Compose**
 - *(For K8s testing)*: **Minikube**, **kubectl**, and **Helm**
 
+> 💡 **Windows Quick Start**: You can simply run `setup.bat` by double-clicking it or executing `.\setup.bat` in Command Prompt / PowerShell for an interactive, all-in-one setup menu.
+
 ---
 
 ## 2. Option A: Quick Local Setup (Docker Compose Only)
