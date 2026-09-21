@@ -8,9 +8,10 @@ This guide walks you through setting up and testing the **Kubernetes Monitoring 
 1. [Prerequisites](#1-prerequisites)
 2. [Option A: Quick Local Setup (Docker Compose Only)](#2-option-a-quick-local-setup-docker-compose-only)
 3. [Option B: Real Kubernetes Setup (Minikube + Prometheus + Promtail)](#3-option-b-real-kubernetes-setup-minikube--prometheus--promtail)
-4. [Using the Web Dashboard](#4-using-the-web-dashboard)
-5. [Automated API Testing](#5-automated-api-testing)
-6. [Stopping All Services](#6-stopping-all-services)
+4. [Running Backend & Frontend with nohup (Terminal-Independent / Background)](#4-running-backend--frontend-with-nohup-terminal-independent--background)
+5. [Using the Web Dashboard](#5-using-the-web-dashboard)
+6. [Automated API Testing](#6-automated-api-testing)
+7. [Stopping All Services](#7-stopping-all-services)
 
 ---
 
@@ -36,8 +37,8 @@ npm run infra:up
 ```
 *(Starts MongoDB on `:27017`, Prometheus on `:9090`, and Loki on `:3100`)*
 
-### Step 2: Install Backend Dependencies (First-time setup)
-**Linux / macOS:**
+### Step 2: Install Backend & Frontend Dependencies (First-time setup)
+**Backend (Linux / macOS):**
 ```bash
 cd backend
 python3 -m venv .venv
@@ -46,13 +47,18 @@ pip install -r requirements.txt
 cd ..
 ```
 
-**Windows (PowerShell / Command Prompt):**
+**Backend (Windows - PowerShell / Command Prompt):**
 ```powershell
 cd backend
 python -m venv .venv
 .venv\Scripts\activate
 pip install -r requirements.txt
 cd ..
+```
+
+**Frontend (All Platforms):**
+```bash
+npm --prefix frontend install
 ```
 
 ### Step 3: Start Backend Server
@@ -71,6 +77,8 @@ In a second terminal:
 npm run frontend:dev
 ```
 - Dashboard opens at `http://localhost:3000`.
+
+> 💡 **Tip (Run in background with `nohup`)**: Want to close your terminal without stopping the backend and frontend? See [Section 4: Running Backend & Frontend with nohup](#4-running-backend--frontend-with-nohup-terminal-independent--background).
 
 ---
 
@@ -139,9 +147,123 @@ npm run backend:dev
 npm run frontend:dev
 ```
 
+> 💡 **Tip (Run in background with `nohup`)**: Want to close your terminal without stopping the servers? See [Section 4: Running Backend & Frontend with nohup](#4-running-backend--frontend-with-nohup-terminal-independent--background).
+
 ---
 
-## 4. Using the Web Dashboard
+## 4. Running Backend & Frontend with `nohup` (Terminal-Independent / Background)
+
+When developing or running on a server or remote VM, closing your terminal sends a `SIGHUP` (hangup) signal that terminates regular processes. Using `nohup` (*no hang up*) detaches the processes from the terminal session and redirects standard output and error to log files so the frontend and backend **continue running in the background even if you close the terminal or disconnect from SSH**.
+
+### 4.1 Prerequisites & Preparation
+Ensure all dependencies have been installed at least once before starting in the background:
+```bash
+# 1. Ensure backend virtual environment & packages are installed:
+cd backend
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+cd ..
+
+# 2. Ensure frontend packages are installed:
+npm --prefix frontend install
+```
+
+---
+
+### 4.2 Start Services in the Background with `nohup`
+
+#### Quick Start: Launch Both at Once
+From the project root directory:
+```bash
+nohup npm run backend:start > backend.log 2>&1 & nohup npm run frontend:dev > frontend.log 2>&1 &
+```
+*(Or replace `backend:start` with `backend:dev` if you want automatic hot-reloading).*
+
+#### Or Launch Each Individually:
+
+**1. Start Backend Server (port 4000):**
+```bash
+nohup npm run backend:start > backend.log 2>&1 &
+```
+- Listens on `http://localhost:4000`.
+- All output and errors are captured in `backend.log`.
+
+**2. Start Frontend Server (port 3000):**
+```bash
+nohup npm run frontend:dev > frontend.log 2>&1 &
+```
+- Dashboard serves on `http://localhost:3000`.
+- All output and errors are captured in `frontend.log`.
+
+> 💡 **Explanation of syntax:**
+> - `nohup`: Prevents the process from terminating when the terminal session ends.
+> - `> backend.log`: Redirects standard output (stdout) to `backend.log`.
+> - `2>&1`: Redirects standard error (stderr) to stdout so all logs go to the same file.
+> - `&`: Executes the command in the background, immediately returning control to your prompt.
+
+---
+
+### 4.3 Verify Services are Running
+
+You can safely exit or close your terminal now! To check whether the services are running at any time from a new terminal:
+
+**1. Check Running Processes:**
+```bash
+ps aux | grep -E "run-backend|uvicorn|vite"
+```
+
+**2. Check Active Ports (Backend :4000, Frontend :3000):**
+```bash
+ss -tulpn | grep -E "3000|4000"
+# or
+lsof -i :3000 -i :4000
+```
+
+**3. Test Backend Health Endpoint:**
+```bash
+curl http://localhost:4000/health
+# Expected response: {"status":"ok"}
+```
+
+---
+
+### 4.4 View Live Output Logs
+
+You can monitor server outputs and debug errors anytime using `tail`:
+
+```bash
+# Follow backend logs in real time
+tail -f backend.log
+
+# Follow frontend logs in real time
+tail -f frontend.log
+
+# View the last 50 lines of both logs
+tail -n 50 backend.log frontend.log
+```
+*(Press `Ctrl + C` to stop watching the logs. The services will keep running in the background).*
+
+---
+
+### 4.5 Stop the Background `nohup` Services
+
+When you need to stop the background servers:
+
+**Option A: Stop by Port (Recommended):**
+```bash
+fuser -k 4000/tcp 3000/tcp
+```
+
+**Option B: Stop by Process Pattern:**
+```bash
+pkill -f "run-backend|uvicorn"
+pkill -f "vite"
+```
+
+---
+
+## 5. Using the Web Dashboard
 
 1. Navigate to **`http://localhost:3000`**.
 2. **Register a User Account**:
@@ -158,7 +280,7 @@ npm run frontend:dev
 
 ---
 
-## 5. Automated API Testing
+## 6. Automated API Testing
 
 You can run automated tests against the backend API while the backend is running:
 
@@ -185,13 +307,14 @@ curl -s -H "Authorization: Bearer $TOKEN" http://localhost:4000/api/alerts
 
 ---
 
-## 6. Stopping All Services
+## 7. Stopping All Services
 
 When you are done testing, run:
 
 ```bash
-# 1. Stop background dev servers and port-forwards
+# 1. Stop background dev servers, nohup processes, and port-forwards
 fuser -k 3000/tcp 4000/tcp 9090/tcp 3100/tcp 27017/tcp 2>/dev/null || true
+pkill -f "run-backend|uvicorn|vite" 2>/dev/null || true
 
 # 2. Stop Docker Compose containers
 npm run infra:down
