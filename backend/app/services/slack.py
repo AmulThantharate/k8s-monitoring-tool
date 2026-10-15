@@ -1,3 +1,9 @@
+"""
+Slack ChatOps integration service for incident alerting.
+Formats and dispatches structured Block Kit messages for threshold breaches and AI diagnostic findings.
+Supports dual Slack webhooks to separate raw metric alarms from detailed AI remediation plans.
+"""
+
 import httpx
 from datetime import datetime, timezone
 from app.config import settings

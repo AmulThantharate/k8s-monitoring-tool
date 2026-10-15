@@ -1,3 +1,9 @@
+"""
+OpenAI LLM provider implementation for autonomous incident analysis.
+Connects to OpenAI's Chat Completions API using models such as GPT-4o and GPT-4o-mini.
+Translates cluster metric anomalies and error logs into actionable SRE root-cause diagnostics.
+"""
+
 import httpx
 from app.services.ai.base import (
     BaseAiProvider,

@@ -1,3 +1,9 @@
+"""
+Multi-cluster Kubernetes discovery service for local and cloud environments.
+Scans kubeconfig files and directories to identify EKS, AKS, GKE, and Minikube clusters.
+Maintains cached cluster metadata and tests API server reachability for multi-cluster operations.
+"""
+
 import os
 import re
 import yaml

@@ -1,3 +1,9 @@
+"""
+Anthropic Claude AI provider implementation for SRE anomaly diagnostics.
+Connects to Anthropic's Messages API using models like Claude 3.5 Sonnet.
+Analyzes cluster performance metrics and container logs to diagnose failures and recommend remediation steps.
+"""
+
 import httpx
 from app.services.ai.base import (
     BaseAiProvider,

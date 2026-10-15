@@ -1,3 +1,9 @@
+"""
+Authentication and security utility functions for the backend service.
+Handles password hashing and verification using bcrypt for operator accounts.
+Generates and validates JWT access tokens to secure protected REST API endpoints.
+"""
+
 from datetime import datetime, timedelta, timezone
 from typing import Optional
 import jwt

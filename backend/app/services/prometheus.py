@@ -1,3 +1,9 @@
+"""
+Prometheus telemetry client for scraping real-time and historical Kubernetes metrics.
+Executes PromQL queries to compute pod and node CPU utilization, memory usage, and restart counts.
+Provides mock and fallback telemetry data when a live Prometheus server is unreachable.
+"""
+
 import time
 import httpx
 from typing import List, Dict, Any, Optional

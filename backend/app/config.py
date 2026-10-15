@@ -1,3 +1,9 @@
+"""
+Global application configuration module powered by Pydantic BaseSettings.
+Loads environment variables from .env files for server, database, Prometheus, Loki, Slack, and AI providers.
+Provides strongly-typed settings used across the entire backend application.
+"""
+
 from typing import List, Union
 from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict

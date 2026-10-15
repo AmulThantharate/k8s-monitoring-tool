@@ -1,3 +1,9 @@
+"""
+Autonomous AI observability and anomaly evaluation engine.
+Periodically gathers workload metrics and recent error logs to construct an incident analysis payload.
+Invokes configured LLM providers (Groq, OpenAI, Claude) and persists root-cause findings and Slack alerts.
+"""
+
 import asyncio
 from datetime import datetime, timezone
 from typing import List

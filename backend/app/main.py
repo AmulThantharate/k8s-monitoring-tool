@@ -1,3 +1,9 @@
+"""
+Main entry point for the Kubernetes Monitoring & Autonomous AI Observability backend.
+Initializes the FastAPI application, sets up CORS middleware, and mounts all API routers.
+Manages the application lifecycle by connecting to MongoDB and starting background rule and AI engines.
+"""
+
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware

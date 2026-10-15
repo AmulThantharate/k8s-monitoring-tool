@@ -1,3 +1,9 @@
+"""
+Background threshold-based rule evaluation engine.
+Periodically inspects pod and node metrics against operational thresholds (CPU, RAM, restarts).
+Triggers immediate alerts, persists incidents into MongoDB, and dispatches Slack notifications.
+"""
+
 import asyncio
 from datetime import datetime, timezone
 from typing import Dict, List, Set

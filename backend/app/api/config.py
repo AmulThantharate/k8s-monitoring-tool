@@ -1,3 +1,9 @@
+"""
+Configuration status API router exposing runtime environment flags to the frontend.
+Returns current AI engine operational status, active AI provider, and configured model name.
+Allows the web dashboard to dynamically adjust UI capabilities based on backend features.
+"""
+
 from fastapi import APIRouter, Depends
 from app.config import settings
 from app.core.security import get_current_user

@@ -1,3 +1,9 @@
+"""
+Pydantic data models and schemas for API request and response validation.
+Defines data structures for user authentication, pod and node metrics, alerts, and cluster details.
+Ensures strong typing and data consistency between the backend services and frontend clients.
+"""
+
 from typing import List, Optional, Literal
 from pydantic import BaseModel, Field, EmailStr
 

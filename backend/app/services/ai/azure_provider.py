@@ -1,3 +1,9 @@
+"""
+Azure OpenAI Service provider implementation for enterprise LLM deployments.
+Connects to custom Azure OpenAI endpoints using deployed models such as GPT-4o.
+Processes pod telemetry and error traces to generate structured incident summaries and fix commands.
+"""
+
 import httpx
 from app.services.ai.base import (
     BaseAiProvider,

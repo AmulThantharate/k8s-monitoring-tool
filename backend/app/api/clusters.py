@@ -1,3 +1,9 @@
+"""
+REST API router for Kubernetes cluster discovery and status reporting.
+Provides endpoints to list all discovered clusters across local and cloud environments.
+Triggers dynamic rescanning of kubeconfig files and cloud credentials on demand.
+"""
+
 from typing import List
 from fastapi import APIRouter, Depends
 from app.core.security import get_current_user

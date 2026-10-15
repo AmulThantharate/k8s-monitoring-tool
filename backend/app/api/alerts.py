@@ -1,3 +1,9 @@
+"""
+REST API router for managing and querying incident alerts.
+Provides endpoints to fetch paginated alerts, filter by status or severity, and resolve active alerts.
+Returns alert documents stored in MongoDB including AI-generated root cause and remediation details.
+"""
+
 from datetime import datetime, timezone
 from typing import List, Optional
 from bson import ObjectId

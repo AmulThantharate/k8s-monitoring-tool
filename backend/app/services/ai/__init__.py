@@ -1,3 +1,9 @@
+"""
+AI service factory and provider registry module.
+Inspects application configuration to instantiate the appropriate LLM provider (Groq, OpenAI, Anthropic, Azure).
+Exports common data models and interfaces for running autonomous incident analysis.
+"""
+
 from app.config import settings
 from app.services.ai.base import (
     BaseAiProvider,

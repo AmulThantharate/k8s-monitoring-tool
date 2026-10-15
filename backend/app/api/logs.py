@@ -1,3 +1,9 @@
+"""
+REST API router for querying pod container logs.
+Interacts with the Loki service or direct Kubernetes API fallback to retrieve recent log streams.
+Enables real-time log inspection in the web frontend terminal without direct kubectl access.
+"""
+
 from typing import List, Optional
 from fastapi import APIRouter, Depends, Query, HTTPException
 from app.core.security import get_current_user

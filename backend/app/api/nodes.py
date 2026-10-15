@@ -1,3 +1,9 @@
+"""
+REST API router for cluster node hardware metrics and status monitoring.
+Fetches CPU, memory, and disk utilization data for physical or virtual Kubernetes nodes.
+Exposes node health summaries queried from Prometheus for display in the operator dashboard.
+"""
+
 from typing import List
 from fastapi import APIRouter, Depends
 from app.core.security import get_current_user

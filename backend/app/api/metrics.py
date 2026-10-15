@@ -1,3 +1,9 @@
+"""
+REST API router for Kubernetes workload metrics and historical telemetry.
+Provides summary metrics for all pods as well as time-series history for CPU and memory usage.
+Queries Prometheus backend and formats data points for frontend charts and sparklines.
+"""
+
 from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, Query
 from app.core.security import get_current_user

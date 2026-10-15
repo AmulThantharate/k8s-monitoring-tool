@@ -1,3 +1,9 @@
+"""
+Asynchronous MongoDB database connection and lifecycle manager.
+Uses Motor (async MongoDB driver) to initialize and manage connection pools.
+Provides accessor functions to retrieve database instances for alert persistence and user data.
+"""
+
 from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorDatabase
 from app.config import settings
 

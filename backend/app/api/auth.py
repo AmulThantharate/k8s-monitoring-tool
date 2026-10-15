@@ -1,3 +1,9 @@
+"""
+Authentication API router handling user registration and login workflows.
+Validates operator credentials against stored bcrypt password hashes in MongoDB.
+Issues signed JWT bearer tokens for authorized access to monitoring and cluster APIs.
+"""
+
 from datetime import datetime, timezone
 from fastapi import APIRouter, HTTPException, status
 from app.core.database import get_database

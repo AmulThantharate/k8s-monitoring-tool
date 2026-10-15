@@ -1,3 +1,9 @@
+"""
+Base abstractions, data models, and prompt definitions for AI incident analysis.
+Defines the standard SRE system prompt used across all LLM providers for root-cause diagnosis.
+Provides data structures and JSON sanitation helpers for parsing AI-generated incident reports.
+"""
+
 import re
 import json
 from abc import ABC, abstractmethod

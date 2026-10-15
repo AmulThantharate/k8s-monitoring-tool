@@ -1,3 +1,9 @@
+"""
+Groq AI provider implementation for ultra-low latency LLM inference.
+Integrates with the Groq Chat Completions API using models like Llama 3.1 and GPT-OSS-120B.
+Submits cluster telemetry and error logs to generate structured root-cause analyses and kubectl fix plans.
+"""
+
 import httpx
 from app.config import settings
 from app.services.ai.base import (
