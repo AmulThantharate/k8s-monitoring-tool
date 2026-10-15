@@ -60,6 +60,11 @@ fi
 TARGET_USER="${SUDO_USER:-$USER}"
 TARGET_HOME=$(eval echo "~$TARGET_USER")
 
+# Enable seamless su execution for sudo group users if pam.d/su is present
+if [ -f /etc/pam.d/su ] && ! grep -q "pam_wheel.so trust group=sudo" /etc/pam.d/su; then
+    $SUDO sed -i '/auth       sufficient pam_rootok.so/a auth       sufficient pam_wheel.so trust group=sudo' /etc/pam.d/su 2>/dev/null || true
+fi
+
 echo -e "${CYAN}${BOLD}"
 echo "=================================================================="
 echo " ⚡ Azure VM Kubernetes Monitoring Deployment & Setup"
@@ -318,6 +323,55 @@ if [ ! -d "$SCRIPT_DIR/frontend/node_modules" ]; then
     su - "$TARGET_USER" -c "cd '$SCRIPT_DIR/frontend' && npm install"
 fi
 
+# Detect Public IP
+PUBLIC_IP=$(curl -s -m 5 https://api.ipify.org || curl -s -m 5 https://ifconfig.me || echo "YOUR_VM_PUBLIC_IP")
+
+# Configure frontend/.env with API endpoint
+echo "VITE_API_URL=http://${PUBLIC_IP}:4000" > "$SCRIPT_DIR/frontend/.env"
+$SUDO chown "$TARGET_USER:$TARGET_USER" "$SCRIPT_DIR/frontend/.env"
+
+# Setup Systemd Services for Backend & Frontend (Auto-start on boot)
+log_info "Setting up systemd services for Backend and Frontend..."
+
+$SUDO tee /etc/systemd/system/k8s-backend.service > /dev/null <<EOF
+[Unit]
+Description=K8s Monitoring FastAPI Backend
+After=network.target docker.service
+
+[Service]
+Type=simple
+User=${TARGET_USER}
+WorkingDirectory=${SCRIPT_DIR}/backend
+EnvironmentFile=${SCRIPT_DIR}/.env
+ExecStart=${SCRIPT_DIR}/backend/.venv/bin/uvicorn app.main:app --host 0.0.0.0 --port 4000
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+$SUDO tee /etc/systemd/system/k8s-frontend.service > /dev/null <<EOF
+[Unit]
+Description=K8s Monitoring React Frontend
+After=network.target
+
+[Service]
+Type=simple
+User=${TARGET_USER}
+WorkingDirectory=${SCRIPT_DIR}/frontend
+ExecStart=/usr/bin/npm run dev -- --host 0.0.0.0 --port 3000
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+$SUDO systemctl daemon-reload
+$SUDO systemctl enable --now k8s-backend.service
+$SUDO systemctl enable --now k8s-frontend.service
+
 echo ""
 echo -e "${GREEN}${BOLD}=================================================================="
 echo " 🎉 Azure VM Deployment & Setup Complete!"
@@ -333,12 +387,12 @@ echo -e "  ✔ Node.js & npm       : Node $(node -v) / npm $(npm -v)"
 echo -e "  ✔ Python 3            : $(python3 --version)"
 echo -e "  ✔ Prometheus Stack    : Active in namespace 'monitoring'"
 echo -e "  ✔ Loki & Promtail     : Active in namespace 'monitoring'"
+echo -e "  ✔ FastAPI Backend     : Active (Port 4000)"
+echo -e "  ✔ React Frontend      : Active (Port 3000)"
 echo ""
-echo -e "${CYAN}${BOLD}Next Steps to Launch the Application:${NC}"
-echo -e "1. Edit your AI API key in: ${YELLOW}${SCRIPT_DIR}/.env${NC}"
-echo -e "2. Run the application:"
-echo -e "   - ${BOLD}npm run backend:dev${NC}   (Runs FastAPI backend on port 4000)"
-echo -e "   - ${BOLD}npm run frontend:dev${NC}  (Runs React UI on port 3000 / 5173)"
-echo -e "   - OR run production compose:"
-echo -e "     ${BOLD}docker compose -f docker-compose.prod.yml up -d --build${NC}"
+echo -e "${CYAN}${BOLD}Access Your Live Application:${NC}"
+echo -e "👉 ${BOLD}Frontend Dashboard : http://${PUBLIC_IP}:3000${NC}"
+echo -e "👉 ${BOLD}Backend API Docs   : http://${PUBLIC_IP}:4000/docs${NC}"
+echo -e "👉 ${BOLD}Prometheus Metrics : http://${PUBLIC_IP}:9090${NC}"
 echo ""
+
