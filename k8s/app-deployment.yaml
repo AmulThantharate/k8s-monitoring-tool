@@ -85,6 +85,11 @@ data:
   AI_ANALYSIS_INTERVAL_MS: "180000"
   EXCLUDE_SYSTEM_NAMESPACES: "true"
   CORS_ORIGINS: "*"
+  SMTP_ENABLED: "true"
+  SMTP_HOST: ""
+  SMTP_PORT: "587"
+  SMTP_USE_TLS: "true"
+  SMTP_USE_SSL: "false"
 ---
 apiVersion: v1
 kind: Secret
@@ -101,6 +106,10 @@ stringData:
   AZURE_OPENAI_ENDPOINT: ""
   SLACK_WEBHOOK_URL_ALERTS: ""
   SLACK_WEBHOOK_URL_AI_ANALYSIS: ""
+  SMTP_USER: ""
+  SMTP_PASSWORD: ""
+  SMTP_FROM_EMAIL: ""
+  SMTP_TO_EMAILS: ""
 ---
 # -------------------------------------------------------------
 # RBAC for Backend Cluster Discovery & Metrics

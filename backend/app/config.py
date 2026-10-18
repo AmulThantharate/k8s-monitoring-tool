@@ -47,6 +47,17 @@ class Settings(BaseSettings):
     SLACK_WEBHOOK_URL_ALERTS: str | None = None
     SLACK_WEBHOOK_URL_AI_ANALYSIS: str | None = None
 
+    # Email Integration Settings (SMTP)
+    SMTP_ENABLED: bool = True
+    SMTP_HOST: str | None = None
+    SMTP_PORT: int = 587
+    SMTP_USER: str | None = None
+    SMTP_PASSWORD: str | None = None
+    SMTP_FROM_EMAIL: str | None = None
+    SMTP_TO_EMAILS: Union[List[str], str] = []
+    SMTP_USE_TLS: bool = True
+    SMTP_USE_SSL: bool = False
+
     # AI Anomaly Detection Settings
     AI_ENABLED: bool = True
     AI_PROVIDER: str = "groq"  # "groq" | "openai" | "anthropic" | "azure"
@@ -88,6 +99,31 @@ class Settings(BaseSettings):
             "http://localhost:3000",
             "http://127.0.0.1:3000",
         ]
+
+    @field_validator("SMTP_TO_EMAILS", mode="after")
+    @classmethod
+    def assemble_smtp_to_emails(cls, v: Union[str, List[str], None]) -> List[str]:
+        if not v:
+            return []
+        if isinstance(v, str):
+            v_clean = v.strip()
+            if v_clean.startswith("[") and v_clean.endswith("]"):
+                import json
+                try:
+                    parsed = json.loads(v_clean)
+                    if isinstance(parsed, list):
+                        return [str(i).strip() for i in parsed if str(i).strip()]
+                except Exception:
+                    pass
+            import re
+            return [i.strip() for i in re.split(r"[,;]+", v_clean) if i.strip()]
+        elif isinstance(v, list):
+            return [str(i).strip() for i in v if str(i).strip()]
+        return []
+
+    @property
+    def is_email_configured(self) -> bool:
+        return bool(self.SMTP_ENABLED and self.SMTP_HOST and self.SMTP_HOST.strip())
 
 
 settings = Settings()

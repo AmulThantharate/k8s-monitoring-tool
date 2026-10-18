@@ -83,6 +83,10 @@ class AlertItem(BaseModel):
     recommended_action: Optional[str] = None
 
 
+class TestEmailRequest(BaseModel):
+    to_email: Optional[str] = None
+
+
 # ==========================================
 # Config Schemas
 # ==========================================
@@ -91,6 +95,8 @@ class AppConfigResponse(BaseModel):
     ai_enabled: bool
     ai_provider: Optional[str] = None
     ai_model: Optional[str] = None
+    slack_configured: bool = False
+    email_configured: bool = False
 
 
 # ==========================================

@@ -12,6 +12,7 @@ from app.config import settings
 from app.core.database import get_database
 from app.services.prometheus import fetch_pod_metrics_summary, fetch_node_metrics_summary
 from app.services.slack import send_slack_alert
+from app.services.email_service import send_email_alert
 
 # In-memory tracker for pod restart counts: podKey -> last restart count
 last_restart_counts: Dict[str, int] = {}
@@ -133,6 +134,17 @@ async def run_rule_evaluation():
                         severity=cond["severity"],
                         message=cond["message"],
                     )
+                    # Trigger Email alert
+                    try:
+                        await send_email_alert(
+                            pod=cond["pod"],
+                            namespace=cond["namespace"],
+                            rule=cond["rule"],
+                            severity=cond["severity"],
+                            message=cond["message"],
+                        )
+                    except Exception as email_err:
+                        print(f"[RuleEngine] Error sending email alert: {email_err}")
                 except Exception as err:
                     print(f"[RuleEngine] Error inserting alert {key}: {err}")
 

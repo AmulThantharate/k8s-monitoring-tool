@@ -7,7 +7,7 @@ import {
   Sparkles,
   ArrowRight,
   Globe,
-  Share2,
+  Mail,
 } from 'lucide-react';
 import { NavigationTab, PodMetric, NodeMetric, AlertItem, DiscoveredCluster } from '../types';
 import { Card } from '../components/ui/Card';
@@ -260,21 +260,21 @@ export const HomePage: React.FC<HomePageProps> = ({
             </div>
           </Card>
 
-          {/* Card 6: Slack Incident Escalation */}
+          {/* Card 6: Slack & Email Incident Escalation */}
           <Card className="p-5 space-y-3 bg-surface hover:border-white/20 transition-all">
             <div className="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400">
-              <Share2 className="w-4 h-4" />
+              <Mail className="w-4 h-4" />
             </div>
             <div>
               <h3 className="text-xs font-semibold text-text-primary uppercase tracking-wide">
-                Slack Alerting & Webhook Escalation
+                Slack & Email Alert Escalation
               </h3>
               <p className="text-xxs text-text-secondary mt-1 leading-relaxed">
-                Instant webhook dispatch to dedicated channels (#k8s-alerts and #k8s-ai-insights). Structured markdown alerts with pod namespace, CPU/RAM stats, and severity markers.
+                Instant multi-channel alerts to Slack (#k8s-alerts, #k8s-ai-insights) and SMTP Inboxes. HTML & markdown alerts with pod namespace, metrics, and AI root causes.
               </p>
             </div>
             <div className="pt-2 border-t border-border/60 flex items-center justify-between text-xxs font-mono">
-              <span className="text-text-secondary">Dual Webhook Pipelines</span>
+              <span className="text-text-secondary">Slack + SMTP Alerts</span>
               <span className="text-amber-400 font-medium">Auto-Notify</span>
             </div>
           </Card>

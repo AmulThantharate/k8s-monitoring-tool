@@ -19,6 +19,7 @@ from app.services.ai import (
     Finding,
 )
 from app.services.slack import send_slack_ai_finding
+from app.services.email_service import send_email_ai_finding
 
 is_ai_running = False
 ai_engine_task: asyncio.Task | None = None
@@ -135,6 +136,12 @@ async def run_ai_evaluation():
                 await asyncio.sleep(0.6)  # 600ms throttle between webhook calls
             except Exception as slack_err:
                 print(f"[AiEngine] Error sending AI Slack notification: {slack_err}")
+
+            # Send Email notification
+            try:
+                await send_email_ai_finding(finding, namespace=finding.namespace or "default")
+            except Exception as email_err:
+                print(f"[AiEngine] Error sending AI Email notification: {email_err}")
 
 
     except Exception as err:

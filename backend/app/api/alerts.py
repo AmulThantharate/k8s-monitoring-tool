@@ -10,7 +10,8 @@ from bson import ObjectId
 from fastapi import APIRouter, Depends, HTTPException, Query
 from app.core.database import get_database
 from app.core.security import get_current_user
-from app.models.schemas import AlertItem
+from app.models.schemas import AlertItem, TestEmailRequest
+from app.services.email_service import send_test_email
 
 router = APIRouter(prefix="/api/alerts", tags=["Alerts"])
 
@@ -81,3 +82,18 @@ async def acknowledge_alert(
         raise HTTPException(status_code=404, detail="not found")
 
     return format_alert_item(updated)
+
+
+@router.post("/test-email")
+async def test_email_alert(
+    payload: Optional[TestEmailRequest] = None,
+    user: dict = Depends(get_current_user),
+):
+    """
+    Sends a test notification email to verify SMTP configuration and credentials.
+    """
+    to_email = payload.to_email if payload else None
+    success, message = await send_test_email(to_email=to_email)
+    if not success:
+        raise HTTPException(status_code=400, detail=f"Failed to send test email: {message}")
+    return {"status": "ok", "message": message}

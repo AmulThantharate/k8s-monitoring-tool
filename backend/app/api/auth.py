@@ -38,6 +38,12 @@ async def login(req: LoginRequest):
             detail="invalid credentials",
         )
 
+    now = datetime.now(timezone.utc)
+    await db["users"].update_one(
+        {"_id": user["_id"]},
+        {"$set": {"last_login_at": now}},
+    )
+
     token = create_access_token(str(user["_id"]), email)
     return TokenResponse(token=token)
 
@@ -62,10 +68,12 @@ async def signup(req: SignupRequest):
         )
 
     pwd_hash = hash_password(password)
+    now = datetime.now(timezone.utc)
     new_user = {
         "email": email,
         "password_hash": pwd_hash,
-        "created_at": datetime.now(timezone.utc),
+        "created_at": now,
+        "last_login_at": now,
     }
 
     res = await db["users"].insert_one(new_user)

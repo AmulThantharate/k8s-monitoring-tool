@@ -38,18 +38,22 @@ Instead of just shouting that something is broken, this tool **diagnoses the exa
    "Here are the logs and numbers. What broke, and what command fixes it?"
            │
            ▼
-4. Delivers Solutions:
-   ├── 💬 Sends formatted Slack message (Explanation + copy-paste command)
-   └── 🖥️ Updates Web Dashboard (Live visual status & graphs)
+4. Delivers Solutions Across Multi-Channels:
+   ├── 💬 Slack Channels (Instant alarms + AI Block Kit cards)
+   ├── 📧 Email Inboxes (Auto-delivered to all registered users + SRE team)
+   └── 🖥️ Web Dashboard (Live visual status, graphs & 1-click acknowledge)
 ```
 
 1. **👀 Monitors Continuously:** Constantly tracks memory, CPU usage, and error logs across your containers.
 2. **🧠 Calls AI for Diagnosis:** When an error or crash occurs, it sends the logs and stats to an LLM (like Groq, OpenAI, or Claude).
 3. **💡 Explains & Solves:** The AI explains the root cause in simple language and gives you the exact command (`kubectl ...`) to resolve it.
-4. **💬 Alerts Your Team:** It posts two types of notifications to Slack:
-   - Instant threshold alerts (e.g. CPU > 85%).
-   - Detailed AI diagnostic cards with the solution.
+4. **💬 Alerts Your Team via Slack & Email:**
+   - **Slack Channels:** Posts immediate metric alarms to `#k8s-alerts` and comprehensive AI diagnostic cards with copyable commands to `#k8s-ai-insights`.
+   - **Email Inboxes:** Automatically discovers all registered users and sends rich HTML post-mortem cards directly to their inbox without blocking the server.
 5. **🖥️ Live Web Dashboard:** A user-friendly dark-mode dashboard where you can see all pods, clusters, real-time health graphs, and live logs.
+
+> [!TIP]
+> For the complete enterprise technical blueprint with sequence diagrams and state machines, see [**`docs/ARCHITECTURE.md`**](file:///home/f33/Documents/k8s-monitoring-tool/docs/ARCHITECTURE.md).
 
 ---
 
@@ -88,8 +92,9 @@ The backend runs silently in the background and does the heavy lifting:
 2. **Metrics & Logs Collector ([`prometheus.py`](file:///home/f33/Documents/k8s-monitoring-tool/backend/app/services/prometheus.py) & [`loki.py`](file:///home/f33/Documents/k8s-monitoring-tool/backend/app/services/loki.py))**: Constantly polls live CPU/RAM usage and pulls error logs from all running pods.
 3. **Threshold Watchdog ([`rule_engine.py`](file:///home/f33/Documents/k8s-monitoring-tool/backend/app/services/rule_engine.py))**: Runs every 30 seconds to catch high CPU, memory spikes, or crashing pods.
 4. **AI Diagnostic Engine ([`ai_engine.py`](file:///home/f33/Documents/k8s-monitoring-tool/backend/app/services/ai_engine.py))**: Packages error logs and metrics, sends them to AI models (Groq, OpenAI, Claude), and extracts clean root-cause explanations and fix commands.
-5. **Slack Bot ([`slack.py`](file:///home/f33/Documents/k8s-monitoring-tool/backend/app/services/slack.py))**: Automatically posts structured cards to Slack with alert summaries and solution commands.
-6. **Fast API & Database ([`api/`](file:///home/f33/Documents/k8s-monitoring-tool/backend/app/api), [`database.py`](file:///home/f33/Documents/k8s-monitoring-tool/backend/app/core/database.py))**: Fast endpoints for the UI to fetch data, stores alert history in MongoDB, and manages user login/auth.
+5. **Slack Bot ([`slack.py`](file:///home/f33/Documents/k8s-monitoring-tool/backend/app/services/slack.py))**: Automatically posts structured Block Kit cards to Slack with alert summaries and solution commands.
+6. **SMTP Email Notifier ([`email_service.py`](file:///home/f33/Documents/k8s-monitoring-tool/backend/app/services/email_service.py))**: Delivers rich HTML diagnostic post-mortems and threshold alerts directly to all registered users and configured on-call engineers.
+7. **Fast API & Database ([`api/`](file:///home/f33/Documents/k8s-monitoring-tool/backend/app/api), [`database.py`](file:///home/f33/Documents/k8s-monitoring-tool/backend/app/core/database.py))**: Fast endpoints for the UI to fetch data, stores alert history in MongoDB, and manages user login/auth.
 
 ---
 

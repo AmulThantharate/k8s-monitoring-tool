@@ -19,4 +19,6 @@ async def get_app_config(user: dict = Depends(get_current_user)):
         ai_enabled=settings.AI_ENABLED,
         ai_provider=settings.AI_PROVIDER if settings.AI_ENABLED else None,
         ai_model=settings.AI_MODEL if settings.AI_ENABLED else None,
+        slack_configured=bool(settings.SLACK_WEBHOOK_URL_ALERTS or settings.SLACK_WEBHOOK_URL_AI_ANALYSIS),
+        email_configured=settings.is_email_configured,
     )
