@@ -117,6 +117,38 @@ else
     log_info "Docker is already installed ($(docker --version))."
 fi
 
+# Ensure Docker Compose CLI plugin is functional
+if [ -f "$TARGET_HOME/.docker/cli-plugins/docker-compose" ]; then
+    if ! su - "$TARGET_USER" -c "docker compose version" >/dev/null 2>&1; then
+        log_warn "Outdated or broken plugin found at $TARGET_HOME/.docker/cli-plugins/docker-compose. Removing..."
+        rm -f "$TARGET_HOME/.docker/cli-plugins/docker-compose" || true
+    fi
+fi
+
+if ! docker compose version >/dev/null 2>&1; then
+    log_info "Ensuring Docker Compose plugin is installed..."
+    $SUDO apt-get update -y
+    $SUDO apt-get install -y docker-compose-v2 || $SUDO apt-get install -y docker-compose-plugin || true
+
+    # In Ubuntu 24.04 (and Debian), docker-compose-v2 places the binary in /usr/libexec/docker/cli-plugins
+    # but docker.io looks for plugins in /usr/lib/docker/cli-plugins
+    if [ -f /usr/libexec/docker/cli-plugins/docker-compose ] && [ ! -e /usr/lib/docker/cli-plugins/docker-compose ]; then
+        $SUDO mkdir -p /usr/lib/docker/cli-plugins
+        $SUDO ln -sf /usr/libexec/docker/cli-plugins/docker-compose /usr/lib/docker/cli-plugins/docker-compose
+    fi
+
+    # Fallback: install latest Docker Compose plugin binary directly if still unavailable
+    if ! docker compose version >/dev/null 2>&1; then
+        log_info "Fetching latest official Docker Compose binary..."
+        $SUDO mkdir -p /usr/lib/docker/cli-plugins
+        COMPOSE_VERSION=$(curl -s https://api.github.com/repos/docker/compose/releases/latest | jq -r '.tag_name // "v2.29.7"')
+        curl -fsSL "https://github.com/docker/compose/releases/download/${COMPOSE_VERSION}/docker-compose-linux-$(uname -m)" -o /tmp/docker-compose
+        $SUDO install -m 0755 /tmp/docker-compose /usr/lib/docker/cli-plugins/docker-compose
+        $SUDO ln -sf /usr/lib/docker/cli-plugins/docker-compose /usr/local/bin/docker-compose || true
+        rm -f /tmp/docker-compose
+    fi
+fi
+
 $SUDO systemctl enable --now docker
 
 # Add user to docker group if not already present
@@ -309,7 +341,13 @@ $SUDO systemctl enable --now k8s-prometheus-forward.service || true
 
 # Start supporting containers (MongoDB & Loki) via docker compose
 log_info "Starting MongoDB & Loki containers..."
-su - "$TARGET_USER" -c "cd '$SCRIPT_DIR' && docker compose -f docker-compose.local.yml up -d mongodb loki"
+COMPOSE_CMD="docker compose"
+if ! su - "$TARGET_USER" -c "docker compose version" >/dev/null 2>&1; then
+    if su - "$TARGET_USER" -c "command -v docker-compose" >/dev/null 2>&1; then
+        COMPOSE_CMD="docker-compose"
+    fi
+fi
+su - "$TARGET_USER" -c "cd '$SCRIPT_DIR' && $COMPOSE_CMD -f docker-compose.local.yml up -d mongodb loki"
 
 # Setup Python Virtual Environment for backend
 if [ ! -d "$SCRIPT_DIR/backend/.venv" ]; then
@@ -379,7 +417,7 @@ echo "=================================================================="
 echo -e "${NC}"
 echo -e "Summary of Installed Components:"
 echo -e "  ✔ Docker Engine       : $(docker --version)"
-echo -e "  ✔ Docker Compose      : $(docker compose version)"
+echo -e "  ✔ Docker Compose      : $(docker compose version 2>/dev/null || docker-compose --version 2>/dev/null || echo 'Ready')"
 echo -e "  ✔ kubectl CLI         : $(kubectl version --client --output=yaml | grep -E 'gitVersion' | head -n1 || echo 'Ready')"
 echo -e "  ✔ Minikube            : $(minikube version --short)"
 echo -e "  ✔ Helm 3              : $(helm version --short)"
